@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.wms.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/proj4.js"></script>
+        <script src="js/proj4leaflet.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/NLM_3.js"></script>
+        <script src="data/LielkFZ_4.js"></script>
+        <script src="data/TDzeme_5.js"></script>
+        <script src="data/NeapbvtasZV_6.js"></script>
+        <script src="data/Vrtbuzonjums_7.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var crs = new L.Proj.CRS('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs', {
+            resolutions: [2800, 1400, 700, 350, 175, 84, 42, 21, 11.2, 5.6, 2.8, 1.4, 0.7, 0.35, 0.14, 0.07],
+        });
+        var map = L.map('map', {
+            crs: crs,
+            continuousWorld: false,
+            worldCopyJump: false, 
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[56.9282290379438,23.911627661227982],[56.985163877020064,24.099487576062604]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+          var tagName = event.target.tagName,
+            popup = map._popup;
+          // Also check if flag is already set.
+          if (tagName === "IMG" && popup && !popup._updated) {
+            popup._updated = true; // Set flag to prevent looping.
+            popup.update();
+          }
+        }, true);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_Ortofoto78cikls_0');
+        map.getPane('pane_Ortofoto78cikls_0').style.zIndex = 400;
+        var layer_Ortofoto78cikls_0 = L.WMS.layer("https://lvmgeoserver.lvm.lv/geoserver/public/wms", "Orto_LKS", {
+            pane: 'pane_Ortofoto78cikls_0',
+            format: 'image/png',
+            uppercase: true,
+            transparent: true,
+            continuousWorld : true,
+            tiled: true,
+            info_format: 'text/html',
+            opacity: 1,
+            identify: false,
+            attribution: '',
+        });
+        map.createPane('pane_OpenStreetMapkarte_1');
+        map.getPane('pane_OpenStreetMapkarte_1').style.zIndex = 401;
+        var layer_OpenStreetMapkarte_1 = L.WMS.layer("https://lvmgeoserver.lvm.lv/geoserver/public/wms", "OSM", {
+            pane: 'pane_OpenStreetMapkarte_1',
+            format: 'image/png',
+            uppercase: true,
+            transparent: true,
+            continuousWorld : true,
+            tiled: true,
+            info_format: 'text/html',
+            opacity: 1,
+            identify: false,
+            attribution: '',
+        });
+        map.addLayer(layer_OpenStreetMapkarte_1);
+        map.createPane('pane_Funkcionlaiszonjums_2');
+        map.getPane('pane_Funkcionlaiszonjums_2').style.zIndex = 402;
+        var layer_Funkcionlaiszonjums_2 = L.WMS.layer("https://dpps.viss.gov.lv/DPPS.REQ/URN_IVIS_100001_ISS-VIDM-2021_apvienotais_WMS-v1-0/guest/URN_IVIS_100273_LIC-5385D0D098DF624B928F41A74C68E62C", "funkcionalais_zonejums", {
+            pane: 'pane_Funkcionlaiszonjums_2',
+            format: 'image/png',
+            uppercase: true,
+            transparent: true,
+            continuousWorld : true,
+            tiled: true,
+            info_format: 'text/html',
+            opacity: 1,
+            identify: false,
+            attribution: '',
+        });
+        function pop_NLM_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">CODE</th>\
+                        <td>' + (feature.properties['CODE'] !== null ? autolinker.link(feature.properties['CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZV_PLAT</th>\
+                        <td>' + (feature.properties['ZV_PLAT'] !== null ? autolinker.link(feature.properties['ZV_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1</th>\
+                        <td>' + (feature.properties['NILM_1'] !== null ? autolinker.link(feature.properties['NILM_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1_PLA</th>\
+                        <td>' + (feature.properties['NILM_1_PLA'] !== null ? autolinker.link(feature.properties['NILM_1_PLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">VEIDS</th>\
+                        <td>' + (feature.properties['VEIDS'] !== null ? autolinker.link(feature.properties['VEIDS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">INDEKSS</th>\
+                        <td>' + (feature.properties['INDEKSS'] !== null ? autolinker.link(feature.properties['INDEKSS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FZ_PLAT</th>\
+                        <td>' + (feature.properties['FZ_PLAT'] !== null ? autolinker.link(feature.properties['FZ_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">APBUVETS</th>\
+                        <td>' + (feature.properties['APBUVETS'] !== null ? autolinker.link(feature.properties['APBUVETS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_NLM_3_0(feature) {
+            switch(String(feature.properties['NILM_1'])) {
+                case '201':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '501':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(1,255,18,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '502':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(1,255,18,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '600':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '601':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '700':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,167,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '701':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,167,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '702':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,167,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '703':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,167,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '704':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,167,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '800':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(205,46,46,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '801':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(205,46,46,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '900':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '901':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '902':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '903':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '905':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '906':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '907':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '908':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,46,169,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1000':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,59,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1001':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,59,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1002':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,59,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1003':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,59,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1101':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1103':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1104':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1105':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1106':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1201':
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,224,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_NLM_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_NLM_3');
+        map.getPane('pane_NLM_3').style.zIndex = 403;
+        map.getPane('pane_NLM_3').style['mix-blend-mode'] = 'normal';
+        var layer_NLM_3 = new L.geoJson(json_NLM_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_NLM_3',
+            layerName: 'layer_NLM_3',
+            pane: 'pane_NLM_3',
+            onEachFeature: pop_NLM_3,
+            style: style_NLM_3_0,
+        });
+        bounds_group.addLayer(layer_NLM_3);
+        function pop_LielkFZ_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">CODE</th>\
+                        <td>' + (feature.properties['CODE'] !== null ? autolinker.link(feature.properties['CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZV_PLAT</th>\
+                        <td>' + (feature.properties['ZV_PLAT'] !== null ? autolinker.link(feature.properties['ZV_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1</th>\
+                        <td>' + (feature.properties['NILM_1'] !== null ? autolinker.link(feature.properties['NILM_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1_PLA</th>\
+                        <td>' + (feature.properties['NILM_1_PLA'] !== null ? autolinker.link(feature.properties['NILM_1_PLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">VEIDS</th>\
+                        <td>' + (feature.properties['VEIDS'] !== null ? autolinker.link(feature.properties['VEIDS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">INDEKSS</th>\
+                        <td>' + (feature.properties['INDEKSS'] !== null ? autolinker.link(feature.properties['INDEKSS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FZ_PLAT</th>\
+                        <td>' + (feature.properties['FZ_PLAT'] !== null ? autolinker.link(feature.properties['FZ_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">APBUVETS</th>\
+                        <td>' + (feature.properties['APBUVETS'] !== null ? autolinker.link(feature.properties['APBUVETS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_LielkFZ_4_0(feature) {
+            switch(String(feature.properties['VEIDS'])) {
+                case 'Savrupmâju apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,245,145,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Mazstâvu dzîvojamâs apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,215,130,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Daudzstâvu dzîvojamâs apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,160,130,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Jauktas centra apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,100,155,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Rûpnieciskâs apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(195,155,215,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Transporta infrastruktûras teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,225,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tehniskâs apbûves teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(200,200,200,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dabas un apstâdîjumu teritorija':
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(170,255,45,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_LielkFZ_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_LielkFZ_4');
+        map.getPane('pane_LielkFZ_4').style.zIndex = 404;
+        map.getPane('pane_LielkFZ_4').style['mix-blend-mode'] = 'normal';
+        var layer_LielkFZ_4 = new L.geoJson(json_LielkFZ_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LielkFZ_4',
+            layerName: 'layer_LielkFZ_4',
+            pane: 'pane_LielkFZ_4',
+            onEachFeature: pop_LielkFZ_4,
+            style: style_LielkFZ_4_0,
+        });
+        bounds_group.addLayer(layer_LielkFZ_4);
+        map.addLayer(layer_LielkFZ_4);
+        function pop_TDzeme_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">CODE</th>\
+                        <td>' + (feature.properties['CODE'] !== null ? autolinker.link(feature.properties['CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TD_ID</th>\
+                        <td>' + (feature.properties['TD_ID'] !== null ? autolinker.link(feature.properties['TD_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TD_DATUMS</th>\
+                        <td>' + (feature.properties['TD_DATUMS'] !== null ? autolinker.link(feature.properties['TD_DATUMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TD_GADS</th>\
+                        <td>' + (feature.properties['TD_GADS'] !== null ? autolinker.link(feature.properties['TD_GADS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TD_SUMMA</th>\
+                        <td>' + (feature.properties['TD_SUMMA'] !== null ? autolinker.link(feature.properties['TD_SUMMA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">D_D_SKAIT</th>\
+                        <td>' + (feature.properties['D_D_SKAIT'] !== null ? autolinker.link(feature.properties['D_D_SKAIT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">D_D_SAUC</th>\
+                        <td>' + (feature.properties['D_D_SAUC'] !== null ? autolinker.link(feature.properties['D_D_SAUC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DAR_PAZ</th>\
+                        <td>' + (feature.properties['DAR_PAZ'] !== null ? autolinker.link(feature.properties['DAR_PAZ'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DAR_PAZ_2</th>\
+                        <td>' + (feature.properties['DAR_PAZ_2'] !== null ? autolinker.link(feature.properties['DAR_PAZ_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_TDzeme_5_0() {
+            return {
+                pane: 'pane_TDzeme_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(203,226,182,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_TDzeme_5');
+        map.getPane('pane_TDzeme_5').style.zIndex = 405;
+        map.getPane('pane_TDzeme_5').style['mix-blend-mode'] = 'normal';
+        var layer_TDzeme_5 = new L.geoJson(json_TDzeme_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_TDzeme_5',
+            layerName: 'layer_TDzeme_5',
+            pane: 'pane_TDzeme_5',
+            onEachFeature: pop_TDzeme_5,
+            style: style_TDzeme_5_0,
+        });
+        bounds_group.addLayer(layer_TDzeme_5);
+        function pop_NeapbvtasZV_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">CODE</th>\
+                        <td>' + (feature.properties['CODE'] !== null ? autolinker.link(feature.properties['CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZV_PLAT</th>\
+                        <td>' + (feature.properties['ZV_PLAT'] !== null ? autolinker.link(feature.properties['ZV_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1</th>\
+                        <td>' + (feature.properties['NILM_1'] !== null ? autolinker.link(feature.properties['NILM_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NILM_1_PLA</th>\
+                        <td>' + (feature.properties['NILM_1_PLA'] !== null ? autolinker.link(feature.properties['NILM_1_PLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">VEIDS</th>\
+                        <td>' + (feature.properties['VEIDS'] !== null ? autolinker.link(feature.properties['VEIDS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">INDEKSS</th>\
+                        <td>' + (feature.properties['INDEKSS'] !== null ? autolinker.link(feature.properties['INDEKSS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FZ_PLAT</th>\
+                        <td>' + (feature.properties['FZ_PLAT'] !== null ? autolinker.link(feature.properties['FZ_PLAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">APBUVETS</th>\
+                        <td>' + (feature.properties['APBUVETS'] !== null ? autolinker.link(feature.properties['APBUVETS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        var pattern_NeapbvtasZV_6_0 = new L.StripePattern({
+            weight: 0.4,
+            spaceWeight: 2.0,
+            color: '#2323ff',
+            opacity: 1.0,
+            spaceOpacity: 0,
+            angle: 315
+        });
+        pattern_NeapbvtasZV_6_0.addTo(map);
+        function style_NeapbvtasZV_6_0(feature) {
+            switch(String(feature.properties['APBUVETS'])) {
+                default:
+                    return {
+                pane: 'pane_NeapbvtasZV_6',
+                stroke: false,
+                fillOpacity: 1,
+                fillPattern: pattern_NeapbvtasZV_6_0,
+                interactive: true,
+            }
+                    break;
+                case '*':
+                    return {
+                pane: 'pane_NeapbvtasZV_6',
+                opacity: 1,
+                color: 'rgba(35,35,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_NeapbvtasZV_6');
+        map.getPane('pane_NeapbvtasZV_6').style.zIndex = 406;
+        map.getPane('pane_NeapbvtasZV_6').style['mix-blend-mode'] = 'normal';
+        var layer_NeapbvtasZV_6 = new L.geoJson(json_NeapbvtasZV_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_NeapbvtasZV_6',
+            layerName: 'layer_NeapbvtasZV_6',
+            pane: 'pane_NeapbvtasZV_6',
+            onEachFeature: pop_NeapbvtasZV_6,
+            style: style_NeapbvtasZV_6_0,
+        });
+        bounds_group.addLayer(layer_NeapbvtasZV_6);
+        function pop_Vrtbuzonjums_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE'] !== null ? autolinker.link(feature.properties['CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZONA_NOS'] !== null ? autolinker.link(feature.properties['ZONA_NOS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Vrtbuzonjums_7_0() {
+            return {
+                pane: 'pane_Vrtbuzonjums_7',
+                opacity: 1,
+                color: 'rgba(228,26,28,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Vrtbuzonjums_7');
+        map.getPane('pane_Vrtbuzonjums_7').style.zIndex = 407;
+        map.getPane('pane_Vrtbuzonjums_7').style['mix-blend-mode'] = 'normal';
+        var layer_Vrtbuzonjums_7 = new L.geoJson(json_Vrtbuzonjums_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Vrtbuzonjums_7',
+            layerName: 'layer_Vrtbuzonjums_7',
+            pane: 'pane_Vrtbuzonjums_7',
+            onEachFeature: pop_Vrtbuzonjums_7,
+            style: style_Vrtbuzonjums_7_0,
+        });
+        bounds_group.addLayer(layer_Vrtbuzonjums_7);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/Vrtbuzonjums_7.png" /> Vērtību zonējums': layer_Vrtbuzonjums_7,'Neapbūvētas ZV<br /><table><tr><td style="text-align: center;"><img src="legend/NeapbvtasZV_6_Neapbūvēta0.png" /></td><td>Neapbūvēta</td></tr><tr><td style="text-align: center;"><img src="legend/NeapbvtasZV_6_Apbūvēta1.png" /></td><td>Apbūvēta</td></tr></table>': layer_NeapbvtasZV_6,'<img src="legend/TDzeme_5.png" /> TD zeme': layer_TDzeme_5,'Lielākā FZ<br /><table><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Savrupmâjuapbûvesteritorija0.png" /></td><td>Savrupmâju apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Mazstâvudzîvojamâsapbûvesteritorija1.png" /></td><td>Mazstâvu dzîvojamâs apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Daudzstâvudzîvojamâsapbûvesteritorija2.png" /></td><td>Daudzstâvu dzîvojamâs apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Jauktascentraapbûvesteritorija3.png" /></td><td>Jauktas centra apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Rûpnieciskâsapbûvesteritorija4.png" /></td><td>Rûpnieciskâs apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Transportainfrastruktûrasteritorija5.png" /></td><td>Transporta infrastruktûras teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Tehniskâsapbûvesteritorija6.png" /></td><td>Tehniskâs apbûves teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_Dabasunapstâdîjumuteritorija7.png" /></td><td>Dabas un apstâdîjumu teritorija</td></tr><tr><td style="text-align: center;"><img src="legend/LielkFZ_4_8.png" /></td><td></td></tr></table>': layer_LielkFZ_4,'NĪLM<br /><table><tr><td style="text-align: center;"><img src="legend/NLM_3_2010.png" /></td><td>201</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_5011.png" /></td><td>501</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_5022.png" /></td><td>502</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_6003.png" /></td><td>600</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_6014.png" /></td><td>601</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_7005.png" /></td><td>700</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_7016.png" /></td><td>701</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_7027.png" /></td><td>702</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_7038.png" /></td><td>703</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_7049.png" /></td><td>704</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_80010.png" /></td><td>800</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_80111.png" /></td><td>801</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90012.png" /></td><td>900</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90113.png" /></td><td>901</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90214.png" /></td><td>902</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90315.png" /></td><td>903</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90516.png" /></td><td>905</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90617.png" /></td><td>906</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90718.png" /></td><td>907</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_90819.png" /></td><td>908</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_100020.png" /></td><td>1000</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_100121.png" /></td><td>1001</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_100222.png" /></td><td>1002</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_100323.png" /></td><td>1003</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_110124.png" /></td><td>1101</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_110325.png" /></td><td>1103</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_110426.png" /></td><td>1104</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_110527.png" /></td><td>1105</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_110628.png" /></td><td>1106</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_120129.png" /></td><td>1201</td></tr><tr><td style="text-align: center;"><img src="legend/NLM_3_30.png" /></td><td></td></tr></table>': layer_NLM_3,"Funkcionālais zonējums": layer_Funkcionlaiszonjums_2,"OpenStreetMap karte": layer_OpenStreetMapkarte_1,"Ortofoto 7/8. cikls": layer_Ortofoto78cikls_0,}).addTo(map);
+        map.on("zoomend", function(){
+
+                if (map.hasLayer(layer_NLM_3)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_NLM_3.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_NLM_3.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_LielkFZ_4)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_LielkFZ_4.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_LielkFZ_4.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_TDzeme_5)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_TDzeme_5.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_TDzeme_5.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_NeapbvtasZV_6)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_NeapbvtasZV_6.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_NeapbvtasZV_6.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        });
+        setBounds();
+                if (map.hasLayer(layer_NLM_3)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_NLM_3.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_NLM_3.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_LielkFZ_4)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_LielkFZ_4.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_LielkFZ_4.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_TDzeme_5)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_TDzeme_5.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_TDzeme_5.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_NeapbvtasZV_6)) {
+                    if (map.getZoom() <= 16 && map.getZoom() >= 19) {
+                        layer_NeapbvtasZV_6.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_NeapbvtasZV_6.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        map.addControl(new L.Control.Search({
+            layer: layer_NeapbvtasZV_6,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'CODE'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        resetLabels([layer_NLM_3,layer_LielkFZ_4,layer_TDzeme_5,layer_NeapbvtasZV_6]);
+        map.on("zoomend", function(){
+            resetLabels([layer_NLM_3,layer_LielkFZ_4,layer_TDzeme_5,layer_NeapbvtasZV_6]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_NLM_3,layer_LielkFZ_4,layer_TDzeme_5,layer_NeapbvtasZV_6]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_NLM_3,layer_LielkFZ_4,layer_TDzeme_5,layer_NeapbvtasZV_6]);
+        });
+        </script>
+    </body>
+</html>
